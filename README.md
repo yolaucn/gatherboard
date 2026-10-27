@@ -6,7 +6,7 @@
 
 双击 `build/归拢.app`，或双击根目录的 `启动归拢.command`。
 
-首发安装包是 [`开源项目/dist/downloads/归拢-1.0.0-universal.dmg`](开源项目/dist/downloads/归拢-1.0.0-universal.dmg)，适配 Apple Silicon 和 Intel Mac，要求 macOS 13 或以上。双击打开后，把「归拢」拖到旁边的「应用程序」文件夹，复制完成后从 Finder「应用程序」打开。图标已内置，安装包不包含任何个人项目或图片。
+首发安装包是 [`website/dist/downloads/归拢-1.0.0-universal.dmg`](website/dist/downloads/归拢-1.0.0-universal.dmg)，适配 Apple Silicon 和 Intel Mac，要求 macOS 13 或以上。双击打开后，把「归拢」拖到旁边的「应用程序」文件夹，复制完成后从 Finder「应用程序」打开。图标已内置，安装包不包含任何个人项目或图片。
 
 DMG 是只读的安装载体，装完可推出或删除；它不保存项目资料。应用从任意位置启动，默认使用同一份用户资料库。
 

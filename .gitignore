@@ -6,4 +6,4 @@ dist/*.dmg
 .DS_Store
 .swiftpm/
 参考/
-开源项目/.openai/
+website/.openai/
