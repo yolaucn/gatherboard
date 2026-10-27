@@ -1,8 +1,7 @@
 .build/
 build/
-dist/*.pkg
-dist/*.zip
-dist/*.dmg
+website/dist/downloads/*.pkg
+website/dist/downloads/*.zip
 .DS_Store
 .swiftpm/
 参考/

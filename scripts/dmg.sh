@@ -13,9 +13,10 @@ TASK_VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "
 TASK_PAYLOAD="$(mktemp -d "$TASK_ROOT/.build/DMGPayload.XXXXXX")"
 ditto "$TASK_APP" "$TASK_PAYLOAD/归拢.app"
 ln -s /Applications "$TASK_PAYLOAD/应用程序"
-cp "$TASK_ROOT/dist/安装说明.txt" "$TASK_PAYLOAD/安装说明.txt"
-mkdir -p "$TASK_ROOT/dist"
-TASK_DMG="$TASK_ROOT/dist/归拢-$TASK_VERSION-universal.dmg"
+cp "$TASK_ROOT/Resources/安装说明.txt" "$TASK_PAYLOAD/安装说明.txt"
+TASK_DOWNLOAD_DIRECTORY="$TASK_ROOT/website/dist/downloads"
+mkdir -p "$TASK_DOWNLOAD_DIRECTORY"
+TASK_DMG="$TASK_DOWNLOAD_DIRECTORY/归拢-$TASK_VERSION-universal.dmg"
 if ! hdiutil create -volname '拖动归拢到应用程序' -srcfolder "$TASK_PAYLOAD" -format UDZO -fs HFS+ -ov "$TASK_DMG"; then
     # makehybrid creates an HFS+ filesystem directly, without a virtual disk device.
     # Conversion then adds the normal compressed UDIF container and checksums.

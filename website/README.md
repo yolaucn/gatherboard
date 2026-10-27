@@ -19,4 +19,4 @@ python3 -m http.server 8765 --directory dist
 - `dist/app.js`：标签切换、滚动进入和校验值复制
 - `dist/downloads/归拢-1.0.0-universal.dmg`：macOS 通用安装包
 
-安装包 SHA-256：`0493d53afcc949041c143086b313ecf7eabbdfef869bc7fe15d9dcc3c48cd79e`
+安装包 SHA-256：`015cdd4b7adee5e93bbd123fc6153baa74b1b239b69c5caa01dd9c446575c6ea`
