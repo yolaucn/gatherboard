@@ -1,0 +1,9 @@
+.build/
+build/
+dist/*.pkg
+dist/*.zip
+dist/*.dmg
+.DS_Store
+.swiftpm/
+参考/
+开源项目/.openai/

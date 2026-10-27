@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="归拢 Gatherboard 是一款原生、离线优先的 macOS 本地项目看板，把散落的任务、备忘、链接和文件归拢到项目里。">
+  <meta name="theme-color" content="#f6f2e9">
+  <title>归拢 Gatherboard｜把散落的工作，归拢到项目里</title>
+  <link rel="icon" type="image/png" href="assets/app-icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="归拢 Gatherboard 首页">
+      <img src="assets/app-icon.png" alt="" width="36" height="36">
+      <span>归拢 <small>Gatherboard</small></span>
+    </a>
+    <nav aria-label="主导航">
+      <a href="#pain">为什么</a>
+      <a href="#features">功能</a>
+      <a href="#local-first">本地优先</a>
+      <a href="#download">下载</a>
+      <a class="nav-download" href="downloads/归拢-1.0.0-universal.dmg" download>免费下载</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-copy reveal">
+        <p class="eyebrow"><span></span> Gatherboard · 本地项目看板</p>
+        <h1>把工作，<br><em>放在一起。</em></h1>
+        <p class="hero-lede">截图散落在桌面，微信文件随手存在“下载”，时间一久，想找时怎么也找不到。归拢把任务、备忘、链接和文件按项目收在一起，用到时一眼就能找到。</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="downloads/归拢-1.0.0-universal.dmg" download>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 20h14"/></svg>
+            下载 macOS 版
+          </a>
+        </div>
+        <p class="hero-meta">v1.0.0 · macOS 13+ · Apple Silicon 与 Intel · 1.2 MB</p>
+      </div>
+
+      <div class="hero-visual reveal" id="workspace" aria-label="归拢应用界面示意">
+        <div class="ambient ambient-one"></div>
+        <div class="ambient ambient-two"></div>
+        <div class="app-window">
+          <div class="titlebar">
+            <div class="traffic"><i></i><i></i><i></i></div>
+            <span>归拢</span>
+            <div class="titlebar-actions"><b></b><b></b></div>
+          </div>
+          <div class="app-shell">
+            <aside class="sidebar">
+              <div class="sidebar-title"><strong>我的项目</strong><button aria-label="新建项目">＋</button></div>
+              <button class="project active"><span class="dot terra"></span><span>产品网站</span><small>8</small></button>
+              <button class="project"><span class="dot green"></span><span>品牌升级</span><small>5</small></button>
+              <button class="project"><span class="dot blue"></span><span>旅行计划</span><small>3</small></button>
+              <div class="sidebar-foot">本地资料库 <span>↗</span></div>
+            </aside>
+            <div class="workspace">
+              <div class="workspace-head">
+                <div><small>项目</small><h2>产品网站</h2></div>
+                <button>···</button>
+              </div>
+              <div class="tabs" role="tablist" aria-label="项目内容">
+                <button class="tab active" data-panel="tasks" role="tab">任务 <b>8</b></button>
+                <button class="tab" data-panel="notes" role="tab">备忘</button>
+                <button class="tab" data-panel="links" role="tab">链接</button>
+                <button class="tab" data-panel="files" role="tab">文件</button>
+              </div>
+              <div class="panels">
+                <div class="panel active" id="panel-tasks" role="tabpanel">
+                  <div class="progress-row"><span>本周进度</span><strong>3 / 8</strong></div>
+                  <div class="progress"><i></i></div>
+                  <ul class="task-list">
+                    <li class="done"><button aria-label="标记为未完成">✓</button><span>梳理首页内容结构</span><time>今天</time></li>
+                    <li class="done"><button aria-label="标记为未完成">✓</button><span>确认视觉方向</span><time>今天</time></li>
+                    <li><button aria-label="标记为完成"></button><span>完成产品界面截图</span><time class="warm">明天</time></li>
+                    <li><button aria-label="标记为完成"></button><span>检查安装包下载</span><time>周五</time></li>
+                  </ul>
+                  <button class="add-task">＋ 添加任务</button>
+                </div>
+                <div class="panel note-panel" id="panel-notes" role="tabpanel">
+                  <span class="note-date">产品网站 · 今日</span>
+                  <h3>发布前检查</h3>
+                  <p>首页文案保持简洁，下载入口在首屏可见。安装说明需要涵盖首次打开的系统提示。</p>
+                  <div class="note-rule"></div>
+                  <p>所有资料都在本地，网站只负责介绍与下载。</p>
+                </div>
+                <div class="panel links-panel" id="panel-links" role="tabpanel">
+                  <div><span class="link-icon">↗</span><p><strong>产品说明</strong><small>README.md</small></p><b>复制</b></div>
+                  <div><span class="link-icon">↗</span><p><strong>视觉参考</strong><small>设计与交互规范</small></p><b>复制</b></div>
+                  <div><span class="link-icon">↗</span><p><strong>发布清单</strong><small>上线前最终检查</small></p><b>复制</b></div>
+                </div>
+                <div class="panel files-panel" id="panel-files" role="tabpanel">
+                  <div class="folder"><span>▰</span><strong>品牌素材</strong><small>12 项</small></div>
+                  <div class="file"><span>PNG</span><strong>首页预览.png</strong><small>2.4 MB</small></div>
+                  <div class="file"><span>PDF</span><strong>产品说明.pdf</strong><small>840 KB</small></div>
+                  <button class="drop-zone">拖入文件，或点击导入</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="visual-caption">一个项目，就是一处完整的工作现场。</p>
+      </div>
+    </section>
+
+    <section class="statement reveal">
+      <p>不是又一个复杂的协作平台。</p>
+      <h2>它只是把散落在各处的工作，<br>收回到你的 Mac 里。</h2>
+    </section>
+
+    <section class="pain-section" id="pain">
+      <div class="pain-intro reveal">
+        <p class="eyebrow"><span></span> 你是不是也这样</p>
+        <h2>资料没有丢。<br>只是再也找不到了。</h2>
+        <p>文件还在电脑里，线索却散落在不同应用和不同日期中。真正浪费时间的，往往不是工作本身，而是反复寻找工作的上下文。</p>
+      </div>
+
+      <div class="pain-grid">
+        <article class="pain-card reveal">
+          <div class="scatter-scene" aria-hidden="true">
+            <span class="source-tag source-desktop">桌面</span>
+            <span class="source-tag source-wechat">微信</span>
+            <span class="source-tag source-download">下载</span>
+            <div class="scattered-file file-shot"><b>PNG</b><small>最终版截图 2.png</small></div>
+            <div class="scattered-file file-chat"><b>DOC</b><small>方案最新版.docx</small></div>
+            <div class="scattered-file file-image"><b>JPG</b><small>微信图片_1027.jpg</small></div>
+          </div>
+          <span class="pain-number">01</span>
+          <h3>截图和项目文件，<br>散落在每一个入口</h3>
+          <p>截完图先放桌面，微信文件随手下载，过几天只记得“好像保存过”，却想不起它究竟在哪里。</p>
+        </article>
+
+        <article class="pain-card reveal">
+          <div class="downloads-scene" aria-hidden="true">
+            <div class="download-row"><span>设计稿_最终版.zip</span><small>今天</small></div>
+            <div class="download-row faded"><span>设计稿_最终版2.zip</span><small>上周</small></div>
+            <div class="download-row faded-more"><span>设计稿_真的最终版.zip</span><small>9月</small></div>
+            <div class="storage-line"><i></i><span>下载项目 · 38.6 GB</span></div>
+          </div>
+          <span class="pain-number">02</span>
+          <h3>“下载”越堆越大，<br>却没有一个敢删除</h3>
+          <p>重名文件、临时素材和多个“最终版”混在一起。你不知道哪些已经归档，哪些下周还会用到。</p>
+        </article>
+
+        <article class="pain-card reveal">
+          <div class="notes-scene" aria-hidden="true">
+            <div class="notes-sidebar">
+              <span>今天 <b>7</b></span><span>昨天 <b>12</b></span><span>上周 <b>36</b></span><span>9月 <b>84</b></span>
+            </div>
+            <div class="notes-paper"><small>10月27日 14:32</small><strong>产品想法</strong><i></i><i></i><i class="short"></i></div>
+          </div>
+          <span class="pain-number">03</span>
+          <h3>备忘录按日期保存，<br>想法却属于某个项目</h3>
+          <p>当时记得很快，之后只能按日期翻找。任务、决策和灵感彼此分离，也离原来的项目越来越远。</p>
+        </article>
+      </div>
+
+      <div class="pain-resolution reveal">
+        <p>归拢不要求你记住文件在哪里。</p>
+        <strong>只要记得，它属于哪个项目。</strong>
+        <a href="#features">看看如何整理 ↓</a>
+      </div>
+    </section>
+
+    <section class="feature-section" id="features">
+      <div class="section-intro reveal">
+        <p class="eyebrow"><span></span> 一处，刚刚好</p>
+        <h2>从下一步，到全部上下文。</h2>
+        <p>每个项目都有自己的任务、备忘、链接与文件。少一点来回切换，多一点真正推进。</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card feature-large reveal">
+          <div class="card-copy"><span>01</span><h3>任务，不只是清单</h3><p>记录截止日期、完成状态与当前进度。界面足够轻，让下一步始终清楚。</p></div>
+          <div class="mini-tasks">
+            <div><i class="checked">✓</i><span>整理需求</span><b>已完成</b></div>
+            <div><i></i><span>制作首屏</span><b class="due">今天</b></div>
+            <div><i></i><span>发布新版本</span><b>周五</b></div>
+          </div>
+        </article>
+        <article class="feature-card reveal">
+          <div class="card-copy"><span>02</span><h3>富文本备忘</h3><p>文字、表格和图片都能粘贴。灵感与决策紧挨着项目本身。</p></div>
+          <div class="scribble"><strong>设计原则</strong><p>清楚胜过聪明，安静胜过热闹。</p><i></i><i></i><i class="short"></i></div>
+        </article>
+        <article class="feature-card dark-card reveal">
+          <div class="card-copy"><span>03</span><h3>真实文件，原样保存</h3><p>导入文件或整个文件夹，不转码、不锁定格式。随时都能从 Finder 直接找到。</p></div>
+          <div class="file-stack"><div>IMG</div><div>PDF</div><div>FIG</div></div>
+        </article>
+        <article class="feature-card feature-wide reveal">
+          <div class="card-copy"><span>04</span><h3>链接也有归属</h3><p>把参考资料、在线文档和交付地址放回对应项目。标题清楚，复制和打开都只需一下。</p></div>
+          <div class="link-pills"><span>↗ 设计稿</span><span>↗ 发布文档</span><span>↗ 灵感图库</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="local-section" id="local-first">
+      <div class="local-art reveal" aria-hidden="true">
+        <div class="folder-back"></div>
+        <div class="paper"><b>library.json</b><i></i><i></i><i></i></div>
+        <div class="folder-front"><span>Projects</span></div>
+      </div>
+      <div class="local-copy reveal">
+        <p class="eyebrow light"><span></span> 本地优先</p>
+        <h2>你的项目，<br>就该由你保管。</h2>
+        <p>归拢没有在线账户，也不把资料上传到服务器。结构数据是 JSON，原始文件仍是原始文件。</p>
+        <dl>
+          <div><dt>默认资料库</dt><dd>~/Library/Application Support/归拢</dd></div>
+          <div><dt>存储方式</dt><dd>JSON + 真实文件目录</dd></div>
+          <div><dt>备份</dt><dd>一键导出 .boardbackup 文件包</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="download-section" id="download">
+      <div class="download-card reveal">
+        <div class="download-copy">
+          <img src="assets/app-icon.png" alt="归拢应用图标" width="84" height="84">
+          <p class="eyebrow"><span></span> 现在开始</p>
+          <h2>把你的第一个项目，<br>放进看板。</h2>
+          <p>免费下载，无需注册。安装后即可离线使用。</p>
+          <a class="button button-primary button-large" href="downloads/归拢-1.0.0-universal.dmg" download>
+            下载归拢 1.0.0
+            <small>通用版 DMG · 1.2 MB</small>
+          </a>
+        </div>
+        <div class="download-details">
+          <h3>安装说明</h3>
+          <ol>
+            <li><span>1</span><p><strong>打开 DMG</strong><small>双击刚刚下载的安装包。</small></p></li>
+            <li><span>2</span><p><strong>拖入“应用程序”</strong><small>复制完成后即可推出安装盘。</small></p></li>
+            <li><span>3</span><p><strong>启动归拢</strong><small>首次运行如被拦截，请在“隐私与安全性”中允许打开。</small></p></li>
+          </ol>
+          <div class="requirements"><span>系统要求</span><strong>macOS 13 或更高版本</strong><small>支持 Apple Silicon 与 Intel Mac</small></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="brand"><img src="assets/app-icon.png" alt="" width="30" height="30"><span>归拢 <small>Gatherboard</small></span></div>
+    <p>原生、本地、专注。为 macOS 制作。</p>
+    <a href="#top">回到顶部 ↑</a>
+  </footer>
+</body>
+</html>
