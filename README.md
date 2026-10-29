@@ -2,6 +2,8 @@
 
 一款原生 macOS 本地项目看板，把散落的任务、备忘、链接和文件归拢到项目里。英文名 Gatherboard。
 
+项目网站：<https://w5gxsw7rv5.coze.site>。
+
 ## 启动
 
 双击 `build/归拢.app`，或双击根目录的 `启动归拢.command`。
@@ -119,4 +121,4 @@ open -n build/归拢.app --args --library /某个可写目录/测试资料库
 
 ## 开源许可
 
-归拢使用 [MIT License](LICENSE) 开源。项目主页：<https://github.com/yolaucn/gatherboard>。
+归拢使用 [MIT License](LICENSE) 开源。源代码：<https://github.com/yolaucn/gatherboard>。
