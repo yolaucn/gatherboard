@@ -2,11 +2,22 @@ import SwiftUI
 import AppKit
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    weak var store: BoardStore?
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
     }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        guard store?.flushPendingNotes() != false else {
+            let alert = NSAlert()
+            alert.messageText = "备忘尚未保存，已取消退出"
+            alert.informativeText = store?.errorMessage ?? "请检查资料库位置后重试。"
+            alert.addButton(withTitle: "返回应用"); alert.runModal()
+            return .terminateCancel
+        }
+        return .terminateNow
+    }
 }
 
 @main
@@ -17,6 +28,7 @@ struct ProjectBoardApp: App {
     var body: some Scene {
         Window("归拢", id: "main") {
             ContentView().environmentObject(store)
+                .onAppear { delegate.store = store }
                 .frame(minWidth: 880, minHeight: 600)
                 .preferredColorScheme(.light)
         }

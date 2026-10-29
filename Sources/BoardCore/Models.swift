@@ -13,6 +13,8 @@ public struct BoardNote: Codable, Identifiable, Equatable, Sendable {
     public var title = ""
     public var text = ""
     public var richText: Data?
+    /// Manual display widths keyed by attachment character position in the saved rich text.
+    public var imageWidths: [String: Double]?
     public var updated = Date()
     public init() {}
     public var displayTitle: String {

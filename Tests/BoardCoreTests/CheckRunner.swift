@@ -34,6 +34,11 @@ struct CheckRunner {
         let suite = LibraryRepositoryTests()
         let checks: [(String, () throws -> Void)] = [
             ("原子保存与任务/备忘/链接恢复", suite.testAtomicMetadataRoundTrip),
+            ("备忘图片独立保存、文件页隐藏和去重", suite.testNoteImagesAreIndependentHiddenAndDeduplicated),
+            ("已有备忘图片补归档且索引保持原样", suite.testLegacyNoteImagesAreArchivedWithoutChangingMetadata),
+            ("标题修改跳过附件扫描，正文变化与重开仍归档", suite.testIncrementalArchiveSkipsUnchangedRichTextAndProcessesChanges),
+            ("备忘图片随项目改名和跨资料库备份恢复", suite.testNoteImagesSurviveProjectRenameAndBackupToAnotherLibrary),
+            ("附件归档失败不保存索引且拒绝符号链接", suite.testNoteImageArchiveFailurePreservesIndexAndRejectsSymlinks),
             ("原文件逐字节复制与同名保护", suite.testImportCopiesOriginalBytesAndDoesNotOverwriteNames),
             ("递归文件夹导入与 Finder 变更同步", suite.testNestedDirectoryImportAndFinderChangesAreDiscovered),
             ("永久删除真实文件并保留导入源", suite.testPermanentDeleteRemovesRealManagedFileButPreservesSource),

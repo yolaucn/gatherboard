@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 import BoardCore
 
 final class LibraryRepositoryTests {
@@ -22,10 +23,148 @@ final class LibraryRepositoryTests {
     func testAtomicMetadataRoundTrip() throws {
         var library = BoardLibrary(); var p = try project()
         p.tasks.append(BoardTask(text: "配置环境", due: Date(timeIntervalSince1970: 123456)))
-        var note = BoardNote(); note.title = "备忘"; note.text = "第一行\n第二行"; note.richText = Data([1, 8, 9]); p.notes.append(note)
+        var note = BoardNote(); note.title = "备忘"; note.text = "第一行\n第二行"; note.richText = Data([1, 8, 9]); note.imageWidths = ["0": 300]; p.notes.append(note)
         p.links.append(BoardLink(title: "设计", url: "https://example.com")); library.projects.append(p)
         try repository.save(library)
         XCTAssertEqual(try repository.open(), library)
+    }
+
+    private func imageNote() throws -> (note: BoardNote, original: URL, bytes: Data) {
+        let bitmap = try XCTUnwrap(NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: 2, pixelsHigh: 2,
+            bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+            colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0))
+        bitmap.bitmapData?.initialize(repeating: 255, count: bitmap.bytesPerRow * bitmap.pixelsHigh)
+        let bytes = try XCTUnwrap(bitmap.representation(using: .png, properties: [:]))
+        let original = try source(bytes: bytes)
+        let wrapper = FileWrapper(regularFileWithContents: try Data(contentsOf: original))
+        wrapper.preferredFilename = original.lastPathComponent
+        let text = NSAttributedString(attachment: NSTextAttachment(fileWrapper: wrapper))
+        var note = BoardNote(); note.text = text.string
+        note.richText = try XCTUnwrap(text.rtfd(from: NSRange(location: 0, length: text.length), documentAttributes: [:]))
+        return (note, original, bytes)
+    }
+
+    private func archivedImages(_ project: BoardProject, in repo: LibraryRepository) throws -> [URL] {
+        let directory = try repo.projectURL(project).appendingPathComponent(".note-attachments")
+        return try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
+    }
+
+    private func assertEmbeddedImage(_ note: BoardNote, bytes: Data) throws {
+        let data = try XCTUnwrap(note.richText)
+        let text = try XCTUnwrap(NSAttributedString(rtfd: data, documentAttributes: nil))
+        let attachment = try XCTUnwrap(text.attribute(.attachment, at: 0, effectiveRange: nil) as? NSTextAttachment)
+        let embedded = try XCTUnwrap(attachment.fileWrapper?.regularFileContents)
+        XCTAssertEqual(embedded, bytes)
+        XCTAssertTrue(NSImage(data: embedded) != nil)
+    }
+
+    func testNoteImagesAreIndependentHiddenAndDeduplicated() throws {
+        let image = try imageNote()
+        var p = try project(); p.notes = [image.note]
+        var library = BoardLibrary(); library.projects = [p]
+        try repository.save(library)
+        _ = try repository.importFiles([image.original], into: "", project: p)
+        let visible = try repository.snapshot(p)
+        XCTAssertEqual(visible.files.count, 1)
+        XCTAssertTrue(visible.folders.isEmpty)
+        try FileManager.default.removeItem(at: image.original)
+        try repository.delete(visible.files.map(\.url), project: p, permanently: true)
+        let archive = try XCTUnwrap(archivedImages(p, in: repository).first)
+        XCTAssertEqual(try Data(contentsOf: archive), image.bytes)
+        XCTAssertTrue(try repository.snapshot(p).files.isEmpty)
+        XCTAssertTrue(try repository.snapshot(p).folders.isEmpty)
+        var duplicate = image.note; duplicate.id = UUID(); duplicate.title = "同图另一条备忘"
+        library.projects[0].notes.append(duplicate)
+        try repository.save(library)
+        try repository.save(library)
+        XCTAssertEqual(try archivedImages(p, in: repository).count, 1)
+        let reopened = try repository.open()
+        for note in reopened.projects[0].notes { try assertEmbeddedImage(note, bytes: image.bytes) }
+    }
+
+    func testLegacyNoteImagesAreArchivedWithoutChangingMetadata() throws {
+        let image = try imageNote()
+        var p = try project(); p.notes = [image.note]
+        var library = BoardLibrary(); library.projects = [p]
+        let legacy = try JSONEncoder().encode(library)
+        try legacy.write(to: repository.manifestURL)
+        try FileManager.default.removeItem(at: image.original)
+        XCTAssertEqual(try repository.open(), library)
+        XCTAssertEqual(try Data(contentsOf: repository.manifestURL), legacy)
+        XCTAssertEqual(try Data(contentsOf: XCTUnwrap(archivedImages(p, in: repository).first)), image.bytes)
+    }
+
+    func testIncrementalArchiveSkipsUnchangedRichTextAndProcessesChanges() throws {
+        let image = try imageNote()
+        var p = try project(); p.notes = [image.note]
+        var library = BoardLibrary(); library.projects = [p]
+        try repository.save(library)
+        let archive = try XCTUnwrap(archivedImages(p, in: repository).first)
+        // Removing this fixture copy lets us detect whether a title-only save revisits it.
+        // Opening the library still performs a complete repair pass.
+        try FileManager.default.removeItem(at: archive)
+        var edited = library
+        edited.projects[0].notes[0].title = "只改标题"
+        try repository.save(edited, archivingChangesFrom: library)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: archive.path))
+        XCTAssertEqual(try JSONDecoder().decode(BoardLibrary.self, from: Data(contentsOf: repository.manifestURL)), edited)
+        let rich = try XCTUnwrap(NSAttributedString(rtfd: XCTUnwrap(image.note.richText), documentAttributes: nil))
+        let changed = NSMutableAttributedString(attributedString: rich)
+        changed.append(NSAttributedString(string: "新增正文"))
+        var next = edited
+        next.projects[0].notes[0].richText = changed.rtfd(from: NSRange(location: 0, length: changed.length), documentAttributes: [:])
+        try repository.save(next, archivingChangesFrom: edited)
+        XCTAssertEqual(try Data(contentsOf: archive), image.bytes)
+        try FileManager.default.removeItem(at: archive)
+        XCTAssertEqual(try repository.open(), next)
+        XCTAssertEqual(try Data(contentsOf: archive), image.bytes)
+    }
+
+    func testNoteImagesSurviveProjectRenameAndBackupToAnotherLibrary() throws {
+        let image = try imageNote()
+        var p = try project(); p.notes = [image.note]
+        var library = BoardLibrary(); library.projects = [p]
+        try repository.save(library)
+        p = try repository.renameProject(p, to: "迁移后的项目")
+        library.projects = [p]; try repository.save(library)
+        let backup = try repository.backup(to: fixture)
+        let target = LibraryRepository(root: fixture.appendingPathComponent("另一资料库"))
+        let empty = try target.open()
+        // Remove both the external source and the old project; restore must be self-contained.
+        try FileManager.default.removeItem(at: image.original)
+        try FileManager.default.removeItem(at: repository.projectURL(p))
+        let restored = try target.restore(from: backup, into: empty)
+        let restoredProject = try XCTUnwrap(restored.projects.first)
+        XCTAssertEqual(try archivedImages(restoredProject, in: target).count, 1)
+        XCTAssertEqual(try Data(contentsOf: XCTUnwrap(archivedImages(restoredProject, in: target).first)), image.bytes)
+        XCTAssertTrue(try target.snapshot(restoredProject).files.isEmpty)
+        XCTAssertTrue(try target.snapshot(restoredProject).folders.isEmpty)
+        try assertEmbeddedImage(XCTUnwrap(target.open().projects.first?.notes.first), bytes: image.bytes)
+    }
+
+    func testNoteImageArchiveFailurePreservesIndexAndRejectsSymlinks() throws {
+        var p = try project()
+        var library = BoardLibrary(); library.projects = [p]
+        try repository.save(library)
+        let before = try Data(contentsOf: repository.manifestURL)
+        let image = try imageNote(); p.notes = [image.note]; library.projects = [p]
+        let directory = try repository.projectURL(p).appendingPathComponent(".note-attachments")
+        let outside = fixture.appendingPathComponent("外部附件", isDirectory: true)
+        try FileManager.default.createDirectory(at: outside, withIntermediateDirectories: true)
+        try FileManager.default.createSymbolicLink(at: directory, withDestinationURL: outside)
+        XCTAssertThrowsError(try repository.save(library))
+        XCTAssertEqual(try Data(contentsOf: repository.manifestURL), before)
+        XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath: outside.path).isEmpty)
+        try FileManager.default.removeItem(at: directory)
+        try repository.save(library)
+        let saved = try Data(contentsOf: repository.manifestURL)
+        let archive = try XCTUnwrap(archivedImages(p, in: repository).first)
+        try FileManager.default.removeItem(at: archive)
+        try FileManager.default.createSymbolicLink(at: archive, withDestinationURL: image.original)
+        library.projects[0].notes[0].title = "尚未保存"
+        XCTAssertThrowsError(try repository.save(library))
+        XCTAssertEqual(try Data(contentsOf: repository.manifestURL), saved)
+        XCTAssertEqual(try Data(contentsOf: image.original), image.bytes)
     }
 
     func testImportCopiesOriginalBytesAndDoesNotOverwriteNames() throws {

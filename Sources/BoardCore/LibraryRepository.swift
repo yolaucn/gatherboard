@@ -38,6 +38,7 @@ public struct LibraryRepository: Sendable {
         }
         let library = try JSONDecoder().decode(BoardLibrary.self, from: Data(contentsOf: manifestURL))
         try validate(library)
+        try archiveNoteImages(in: library)
         return library
     }
 
@@ -52,9 +53,12 @@ public struct LibraryRepository: Sendable {
         }
     }
 
-    public func save(_ library: BoardLibrary) throws {
+    /// `previous` must be a snapshot already opened or successfully saved in this repository.
+    public func save(_ library: BoardLibrary, archivingChangesFrom previous: BoardLibrary? = nil) throws {
         try validate(library)
         try checkPath(manifestURL)
+        // Commit image copies before the index. A failed archive must not report a saved note.
+        try archiveNoteImages(in: library, comparedTo: previous)
         let encoder = JSONEncoder(); encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         try encoder.encode(library).write(to: manifestURL, options: .atomic)
     }

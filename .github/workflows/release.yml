@@ -1,0 +1,62 @@
+name: Publish release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - Resources/Info.plist
+      - .github/workflows/release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read version
+        id: version
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import plistlib
+          with open('Resources/Info.plist', 'rb') as source:
+              version = plistlib.load(source)['CFBundleShortVersionString']
+          if not all(part.isdigit() for part in version.split('.')) or len(version.split('.')) != 3:
+              raise SystemExit('Invalid release version')
+          print(f'version={version}')
+          PY
+      - name: Verify release files
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          test -s "docs/releases/$VERSION.md"
+          cd website/dist/downloads
+          sha256sum -c "归拢-$VERSION-universal.dmg.sha256"
+          mkdir -p ../../../.build/release
+          cp "归拢-$VERSION-universal.dmg" "../../../.build/release/Gatherboard-$VERSION-macos-universal.dmg"
+          cd ../../../.build/release
+          sha256sum "Gatherboard-$VERSION-macos-universal.dmg" > "Gatherboard-$VERSION-macos-universal.dmg.sha256"
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          tag="v$VERSION"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "::notice::Release $tag already exists; keeping it unchanged."
+            exit 0
+          fi
+          gh release create "$tag" \
+            ".build/release/Gatherboard-$VERSION-macos-universal.dmg" \
+            ".build/release/Gatherboard-$VERSION-macos-universal.dmg.sha256" \
+            --target "$GITHUB_SHA" \
+            --title "归拢 $VERSION" \
+            --notes-file "docs/releases/$VERSION.md" \
+            --latest
